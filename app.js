@@ -16,12 +16,6 @@ const routes = require('./api/routes');
 const app = express();
 const port = process.env.NODE_ENV === 'development' ? '3005' : '3004';
 
-// database
-app.locals.pool = createPool(config.mysql);
-app.locals.pool.add('local', config.mysql0);
-// app.locals.pool.add('db1', config.mysql1);
-// app.locals.pool.add('db2', config.mysql2);
-// app.locals.pool.add('db3', config.mysql3);
 
 
 

@@ -2,11 +2,9 @@
 const os = require('os');
 const { Router } = require('express');
 
-const limiter = require('../controllers/limiter');
 const pjson = require('../../package.json');
-const category = require('../controllers/category');
-const shabad = require('../controllers/shabad');
-const collection = require('../controllers/collection');
+
+const limiter = require('../controllers/limiter');
 const healthcheck = require('../controllers/healthcheck');
 
 const route = Router();
@@ -15,11 +13,14 @@ route.get('/', limiter.rate100, (req, res) => {
     res.json({
       name: 'SikhiFM API',
       version: pjson.js,
-      documentation: 'no' ,
+      documentation: 'route for SikhiFM api' ,
       endpoint: os.hostname().substr(0, 3),
     });
   });
   
+//hello world!
+route.get('/hello', (req, res) => res.send('Hello World!'))
+
 // HEALTHCHECK -- is this a requirement?
 // Healthcheck Routes
 route.get('/health', limiter.rate250, healthcheck.db);
