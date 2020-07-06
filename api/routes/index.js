@@ -5,6 +5,7 @@ const pjson = require('../../package.json');
 
 const limiter = require('../controllers/limiter');
 const healthcheck = require('../controllers/healthcheck');
+const album = require('../controllers/album');
 
 const route = Router();
 
@@ -17,12 +18,14 @@ route.get('/', limiter.rate100, (req, res) => {
   });
 });
 
-// hello world!
-route.get('/hello', (req, res) => res.send('Hello World!'));
+//hello world!
+route.get('/hello', (req, res) => res.send('Hello World!'))
 
-// HEALTHCHECK -- is this a requirement?
-// Healthcheck Routes
+// healthcheck 
 route.get('/health', limiter.rate250, healthcheck.db);
+
+// all albums
+route.get('/albums', limiter.rate250, album.allAlbums);
 
 // ID
 // route.get('/id/:ShabadID', limiter.rate100, shabad.byID);
