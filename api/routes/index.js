@@ -18,14 +18,19 @@ route.get('/', limiter.rate100, (req, res) => {
   });
 });
 
-//hello world!
-route.get('/hello', (req, res) => res.send('Hello World!'))
+// hello world!
+route.get('/hello', (req, res) => res.send('Hello World!'));
 
-// healthcheck 
+// healthcheck
 route.get('/health', limiter.rate250, healthcheck.db);
 
 // all albums
 route.get('/albums', limiter.rate250, album.allAlbums);
+
+// by album id
+route.get('/albums/:albumID', limiter.rate250, album.byAlbumID);
+
+
 
 // ID
 // route.get('/id/:ShabadID', limiter.rate100, shabad.byID);

@@ -4,13 +4,13 @@ const allAlbums = async (req, res) => {
 
 exports.allAlbums = allAlbums;
 
-// album sql query
+const byAlbumID = async (req, res) => {
+    const albumID = parseInt(req.params.albumID, 10);
+    res.send('by albumID'  + albumID);
+}
 
-// basic:
-//SELECT * FROM `sikhifm_db`.`Album`
-//WHERE `Parent` IS NULL;
+exports.byAlbumID = byAlbumID;
 
-// with join:
-// SELECT * FROM `sikhifm_db`.`Album`
-// LEFT JOIN `TrackAlbum` ON `Album`.`ID`=`TrackAlbum`.`Album`
-// WHERE `Parent` IS NULL;
+
+
+

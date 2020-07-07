@@ -6,12 +6,15 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const cacheControl = require('express-cache-controller');
-// const { createPool } = require('mariadb');
-// const config = require('./api/config');
+const { createPool } = require('mariadb');
+const config = require('./api/config');
 const routes = require('./api/routes');
 
 const app = express();
-const port = process.env.NODE_ENV === 'development' ? '3005' : '3004';
+const port = process.env.NODE_ENV === 'development' ? '3005' : '3004'; 
+
+app.locals.pool = createPool(config);
+
 
 // app
 app.use(cors());

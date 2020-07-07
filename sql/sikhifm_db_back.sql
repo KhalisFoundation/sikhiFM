@@ -3,7 +3,7 @@
 --
 -- https://tableplus.com/
 --
--- Database: SikhiFM
+-- Database: sikhifm_db
 -- Generation Time: 2020-07-06 11:14:21.9310
 -- -------------------------------------------------------------
 
