@@ -1,4 +1,4 @@
-// imports 
+// imports
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
@@ -21,7 +21,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use('/v1', routes);
 
-// sends error 404 message if necessary 
+// sends error 404 message if necessary
 app.use((req, res) => {
   res.cacheControl = { noCache: true };
   res.status(404).send({ url: `${req.originalUrl} not found` });

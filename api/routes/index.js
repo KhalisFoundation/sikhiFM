@@ -35,17 +35,18 @@ route.get('/albums', limiter.rate250, album.allAlbums);
 // by album id
 route.get('/albums/:albumID', limiter.rate250, album.byAlbumID);
 
-// all tracks
-route.get('/tracks', limiter.rate100, track.allTracks);
-
 // all tracks in an album by id
-route.get('/tracks/albumid/:albumid', limiter.rate100, track.tracksInAlbumID);
+route.get('/tracks?albumid={albumid}', limiter.rate100, track.multipleTracks);
+
+// all tracks
+route.get('/tracks', limiter.rate100, track.multipleTracks);
 
 // by track id
 route.get('/tracks/:trackID', limiter.rate250, track.byTrackID);
 
-module.exports = route;
 
+
+module.exports = route;
 
 // original routes
 
