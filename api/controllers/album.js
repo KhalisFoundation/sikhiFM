@@ -1,4 +1,5 @@
-// all albums
+// function: allAlbums
+// sends all parent albums (MAKE THIS MORE CLEAR)
 const allAlbums = async (req, res) => {
   let conn;
   try {
@@ -12,7 +13,6 @@ const allAlbums = async (req, res) => {
     return;
   } finally {
     if (conn) {
-      conn.release();
       conn.end();
     }
   }
@@ -20,14 +20,15 @@ const allAlbums = async (req, res) => {
 
 exports.allAlbums = allAlbums;
 
-// by album ID
+// function:byAlbumID
+// sends the album with the given id 
 const byAlbumID = async (req, res) => {
   let conn;
   const albumID = parseInt(req.params.albumID, 10);
-  console.log("album id: " + albumID);
+  console.log(`album id: ${albumID}`);
   try {
     conn = await req.app.locals.pool.getConnection();
-    const q = 'SELECT * FROM `sikhifm_db`.`Album` WHERE `ID` = 2;';
+    const q = 'SELECT * FROM `sikhifm_db`.`Album` WHERE `ID` = ' + albumID + ';';
     const result = await conn.query(q);
     res.json(result);
     return;
@@ -36,10 +37,9 @@ const byAlbumID = async (req, res) => {
     return;
   } finally {
     if (conn) {
-      conn.release();
       conn.end();
     }
   }
-  // res.send(`by albumID${albumID}`);
 };
+
 exports.byAlbumID = byAlbumID;
