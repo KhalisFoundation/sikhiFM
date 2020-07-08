@@ -30,8 +30,6 @@ route.get('/albums', limiter.rate250, album.allAlbums);
 // by album id
 route.get('/albums/:albumID', limiter.rate250, album.byAlbumID);
 
-
-
 // ID
 // route.get('/id/:ShabadID', limiter.rate100, shabad.byID);
 
