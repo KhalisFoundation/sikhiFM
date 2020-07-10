@@ -1,19 +1,10 @@
-
-// import * express from 'express';
-// import * as bodyParser from 'body-parser';
-// import * as cors from 'cors';
-// import cacheControl from 'express-cache-controller';
-// import { createPool } from 'mariadb';
-// import {config } from'./api/config';
-// import routes from './api/routes';
-// imports
-const express = require('express');
-const bodyParser = require('body-parser');
-const cors = require('cors');
-const cacheControl = require('express-cache-controller');
-const { createPool } = require('mariadb');
-const config = require('./api/config');
-const routes = require('./api/routes');
+import express from 'express';
+import bodyParser from 'body-parser';
+import cors from 'cors';
+import cacheControl from 'express-cache-controller';
+import { createPool } from 'mariadb';
+import { config } from './api/config';
+import routes from './api/routes';
 
 // app initialization with express on port 3004 (3005 for development)
 const app = express();
@@ -39,5 +30,3 @@ app.use((req, res) => {
 app.listen(port, () => {
   console.log(`SikhiFM API start on port ${port}`);
 });
-
-module.exports = app;

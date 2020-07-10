@@ -1,5 +1,5 @@
 // config for SikhiFM Database
-const metadata = {
+export const config = {
   host: 'localhost',
   user: process.env.DB_USER || 'root',
   password: process.env.DB_PASSWORD || 'root',
@@ -9,4 +9,3 @@ const metadata = {
   // multipleStatements : true
 };
 
-module.exports = metadata;

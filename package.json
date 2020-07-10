@@ -7,7 +7,7 @@
     "test": "npm run lint",
     "lint": "npm run prettier && eslint app.js api/**/*.js --fix",
     "prettier": "prettier --write app.js api/**/*.js ",
-    "start": "nodemon ç ./app.js"
+    "start": "nodemon --exec babel-node app.js"
   },
   "author": "",
   "license": "MIT",
