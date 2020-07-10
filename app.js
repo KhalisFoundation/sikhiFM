@@ -1,14 +1,19 @@
-// const express = require('express');
-//import * as express from 'express';
 
+// import * express from 'express';
+// import * as bodyParser from 'body-parser';
+// import * as cors from 'cors';
+// import cacheControl from 'express-cache-controller';
+// import { createPool } from 'mariadb';
+// import {config } from'./api/config';
+// import routes from './api/routes';
 // imports
-import * as express from 'express';
-import * as bodyParser from 'body-parser';
-import * as cors from 'cors';
-import * as cacheControl from 'express-cache-controller';
-import { createPool } from 'mariadb';
-import { config } from './api/config';
-import * as routes from './api/routes';
+const express = require('express');
+const bodyParser = require('body-parser');
+const cors = require('cors');
+const cacheControl = require('express-cache-controller');
+const { createPool } = require('mariadb');
+const config = require('./api/config');
+const routes = require('./api/routes');
 
 // app initialization with express on port 3004 (3005 for development)
 const app = express();

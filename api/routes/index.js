@@ -27,20 +27,20 @@ route.get('/', limiter.rate100, (req, res) => {
 route.get('/hello', (req, res) => res.send('Hello World!'));
 
 // healthcheck
-//route.get('/health', limiter.rate250, healthcheck.healthcheck);
+route.get('/health', limiter.rate250, healthcheck.healthcheck);
 
 // all albums
 route.get('/albums', limiter.rate250, album.allAlbums);
 
 // by album id
-//route.get('/albums/:albumID', limiter.rate250, album.byAlbumID);
+route.get('/albums/:albumID', limiter.rate250, album.byAlbumID);
 
 // all tracks
-//route.get('/tracks', limiter.rate100, track.multipleTracks);
+route.get('/tracks', limiter.rate100, track.multipleTracks);
 
 // by track id
 // all tracks in an album via: '/tracks?albumid={albumid}'
-//route.get('/tracks/:trackID', limiter.rate250, track.byTrackID);
+route.get('/tracks/:trackID', limiter.rate250, track.byTrackID);
 
 module.exports = route;
 
