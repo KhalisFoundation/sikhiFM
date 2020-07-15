@@ -4,7 +4,8 @@
   "description": "SikhiFM API",
   "main": "app.js",
   "scripts": {
-    "test": "npm run lint",
+    "test": "jest",
+    "test:watch": "jest --watch",
     "lint": "npm run prettier && eslint app.js api/**/*.js --fix",
     "prettier": "prettier --write app.js api/**/*.js ",
     "start": "nodemon --exec babel-node --experimental-modules --experimental-json-modules ./app.js"
@@ -20,6 +21,8 @@
     "mariadb": "^2.4.1",
     "memory-cache": "^0.2.0",
     "module": "^1.2.5",
+    "node-fetch": "^2.6.0",
+    "regenerator-runtime": "^0.13.5",
     "sql": "^0.78.0",
     "typescript": "^3.9.6"
   },
@@ -33,9 +36,13 @@
     "eslint-plugin-import": "^2.22.0",
     "eslint-plugin-prettier": "^3.1.4",
     "husky": "^4.2.5",
+    "jest": "^26.1.0",
+    "jest-puppeteer": "^4.4.0",
     "lint-staged": "^10.2.11",
     "nodemon": "^2.0.4",
-    "prettier": "^2.0.5"
+    "prettier": "^2.0.5",
+    "puppeteer": "^5.1.0",
+    "supertest": "^4.0.2"
   },
   "husky": {
     "hooks": {

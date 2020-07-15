@@ -5,7 +5,6 @@ export async function multipleTracks(req, res) {
   let conn;
   let q;
   const albumid = parseInt(req.query.albumid, 10);
-  console.log(albumid);
   let result;
   try {
     conn = await req.app.locals.pool.getConnection();
@@ -13,12 +12,10 @@ export async function multipleTracks(req, res) {
       q =
         'SELECT * FROM `TrackAlbum` LEFT JOIN `Track`' +
         'ON `TrackAlbum`.`Album` = `Track`.`ID` WHERE `Album` = ?';
-      console.log(q);
       result = await conn.query(q, [albumid]);
     } else {
       q = 'SELECT * FROM `Track`;';
       result = await conn.query(q);
-      console.log(q);
     }
     res.json(result);
     return;

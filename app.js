@@ -1,5 +1,10 @@
-// imports
+/**
+ * express module
+ * @const
+ */
 import express from 'express';
+
+//dependencies
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import cacheControl from 'express-cache-controller';

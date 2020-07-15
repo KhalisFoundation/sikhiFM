@@ -1,19 +1,18 @@
-// imports
-import * as os from 'os';
-import express from 'express';
-
-// file connections
+// dependencies
 import * as pjson from '../../package.json';
 import limiter from '../controllers/limiter';
 import { healthcheck } from '../controllers/healthcheck';
 import { allAlbums, byAlbumID } from '../controllers/album';
 import { multipleTracks, byTrackID } from '../controllers/track';
 
+import * as os from 'os';
+import express from 'express';
+
 const route = express.Router();
 
 // Routes
 
-// landing
+//landing page
 route.get('/', limiter.rate250, (req, res) => {
   res.json({
     name: 'SikhiFM API',
@@ -40,33 +39,8 @@ route.get('/tracks', limiter.rate250, multipleTracks);
 
 // by track id
 // all tracks in an album via: '/
-//tracks?albumid={albumid}'
+// tracks?albumid={albumid}'
 route.get('/tracks/:trackID', limiter.rate250, byTrackID);
 
 // exports the entire route object
 export default route;
-
-// module.exports = route;
-
-// original routes
-
-// ID
-// route.get('/id/:ShabadID', limiter.rate100, shabad.byID);
-
-// acronym
-// route.get('/line/:FirstLetters', limiter.rate100, shabad.byAcronym);
-
-// line or keyword
-// route.get('/verse/:Verse', limiter.rate100, shabad.byVerse);
-
-// bani
-// route.get('/bani/:Bani', limiter.rate100, category.byBani);
-
-// raag
-// route.get('raag/:Raag', limiter.rate100, category.ByRaag);
-
-// author
-// route.get('author/:Author',limiter.rate100, collection.byAuthor);
-
-// kirtanis
-// route.get('kirtani/:Kirtani',limiter.rate100, collection.byKirtani);

@@ -1,5 +1,5 @@
 // function: allAlbums
-// sends all parent albums (MAKE THIS MORE CLEAR)
+// sends all parent albums 
 export async function allAlbums(req, res) {
   let conn;
   try {
@@ -23,7 +23,6 @@ export async function allAlbums(req, res) {
 export async function byAlbumID(req, res) {
   let conn;
   const albumID = parseInt(req.params.albumID, 10);
-  console.log(`album id: ${albumID}`);
   try {
     conn = await req.app.locals.pool.getConnection();
     const q = 'SELECT * FROM `Album` WHERE `ID` = ?;';
