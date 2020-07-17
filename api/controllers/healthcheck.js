@@ -3,12 +3,12 @@
 // selects something from a generic table which is garunteed to be true if the database is connected
 
 /**
-* function: healthcheck
-* simple request to see if the service is up and running
-* sele
-* @param {Request} req - Express request object
-* @param {Response} res - Express response object
-*/
+ * function: healthcheck
+ * simple request to see if the service is up and running
+ * sele
+ * @param {Request} req - Express request object
+ * @param {Response} res - Express response object
+ */
 
 export async function healthcheck(req, res) {
   let conn;

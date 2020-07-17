@@ -1,4 +1,4 @@
-//dependencies
+// dependencies
 import express from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
@@ -32,7 +32,6 @@ app.use((req, res) => {
 //   console.log(`SikhiFM API start on port ${port}`);
 // });
 
-
 app.listen(port, () => {
-    console.log(`SikhiFM API start on port ${port}`);
+  console.log(`SikhiFM API start on port ${port}`);
 });

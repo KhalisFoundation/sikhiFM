@@ -1,5 +1,3 @@
-
-
 // function: allAlbums
 // sends all parent albums
 export async function allAlbums(req, res) {
