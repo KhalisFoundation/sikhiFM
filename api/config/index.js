@@ -1,6 +1,6 @@
 /**
  * config for SikhiFM Database
- * @const {JSON}
+ * @const {JSON} config
  */
 export const config = {
   host: 'localhost',

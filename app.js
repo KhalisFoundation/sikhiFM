@@ -1,10 +1,5 @@
-/**
- * express module
- * @const
- */
-import express from 'express';
-
 //dependencies
+import express from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import cacheControl from 'express-cache-controller';
@@ -33,8 +28,11 @@ app.use((req, res) => {
 });
 
 // connection to port
-app.listen(port, () => {
-  console.log(`SikhiFM API start on port ${port}`);
-});
+// app.listen(port, () => {
+//   console.log(`SikhiFM API start on port ${port}`);
+// });
 
-export default app;
+
+app.listen(port, () => {
+    console.log(`SikhiFM API start on port ${port}`);
+});

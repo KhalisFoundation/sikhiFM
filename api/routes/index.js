@@ -1,18 +1,17 @@
 // dependencies
+import * as os from 'os';
+import express from 'express';
 import * as pjson from '../../package.json';
 import limiter from '../controllers/limiter';
 import { healthcheck } from '../controllers/healthcheck';
 import { allAlbums, byAlbumID } from '../controllers/album';
 import { multipleTracks, byTrackID } from '../controllers/track';
 
-import * as os from 'os';
-import express from 'express';
-
 const route = express.Router();
 
 // Routes
 
-//landing page
+// landing
 route.get('/', limiter.rate250, (req, res) => {
   res.json({
     name: 'SikhiFM API',
@@ -38,7 +37,7 @@ route.get('/albums/:albumID', limiter.rate250, byAlbumID);
 route.get('/tracks', limiter.rate250, multipleTracks);
 
 // by track id
-// all tracks in an album via: '/
+// all tracks in an album via:
 // tracks?albumid={albumid}'
 route.get('/tracks/:trackID', limiter.rate250, byTrackID);
 

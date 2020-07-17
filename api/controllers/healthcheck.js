@@ -1,18 +1,14 @@
 // function: healthcheck
 // simple request to see if the service is up and running
 // selects something from a generic table which is garunteed to be true if the database is connected
+
 /**
- * function: healthcheck
- * simple request to see if the service is up and running
- * selects something from a generic table which is garunteed to be true if the database is connected
- *
- * @param {Obhect} req - Express request object
- * @param {Object} res - Express response object
- * @return {?} ?
- *
- * @example
- * healthcheck()... 
- */
+* function: healthcheck
+* simple request to see if the service is up and running
+* sele
+* @param {Request} req - Express request object
+* @param {Response} res - Express response object
+*/
 
 export async function healthcheck(req, res) {
   let conn;
