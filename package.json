@@ -20,7 +20,8 @@
     "limiter": "^1.1.5",
     "mariadb": "^2.4.1",
     "memory-cache": "^0.2.0",
-    "node-fetch": "^2.6.0"
+    "node-fetch": "^2.6.0",
+    "swagger-ui-dist": "^3.18.1"
   },
   "devDependencies": {
     "@babel/core": "^7.10.4",
@@ -37,7 +38,6 @@
     "lint-staged": "^10.2.11",
     "nodemon": "^2.0.4",
     "prettier": "^2.0.5",
-    "puppeteer": "^5.1.0",
     "supertest": "^4.0.2"
   },
   "husky": {

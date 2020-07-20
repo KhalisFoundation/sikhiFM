@@ -4,8 +4,8 @@ import express from 'express';
 import * as pjson from '../../package.json';
 import limiter from '../controllers/limiter';
 import { healthcheck } from '../controllers/healthcheck';
-import {byAlbumID, albumsBy } from '../controllers/album';
-import {byTrackID, tracksBy} from '../controllers/track';
+import { byAlbumID, albumsBy } from '../controllers/album';
+import { byTrackID, tracksBy } from '../controllers/track';
 
 const route = express.Router();
 
@@ -39,8 +39,6 @@ route.get('/albums', limiter.rate250, albumsBy);
 
 // by album id
 route.get('/albums/:albumID', limiter.rate250, byAlbumID);
-
-
 
 // TRACKS
 /**
