@@ -1,43 +1,43 @@
 // function: allAlbums
 // sends all parent albums
 
-import { query } from 'express';
-
 /**
  * /albums : all albums
- * /albums?nameincl={name} : Search for album that matches this name (fuzzy match)
+ * /albums?name={name} : Search for album that matches this name (fuzzy match)
  * /albums?tag={tag} : Search for albums that have these tags (fuzzy matches)
  * /albums?keyword={keyword} : Search for albums that have these keywords (fuzzy matches)
- * /albums?parentid={parentid} : Search for albums that has this albumId as a parent.
- * /albums?updatedafter={date} : Search for albums that were last updated after this date.
+ * /albums?parentID={parentID} : Search for albums that has this albumId as a parent.
+ * /albums?updated={updated} : Search for albums that were last updated after this date.
  */
 export async function albumsBy(req, res) {
   let conn;
-  const nameIncludes = req.query.nameincl;
-  // lint/prettier keeps trying to {tag} but everything breaks then
-  //const { tag } = req.query;
-
-  const tag = req.query.tag;
-  const parentID = parseInt(req.query.parentid, 10);
-  const date = req.query.date;
+  const { name } = req.query;
+  const { tag } = req.query;
   const { keyword } = req.query;
-  const queryRes = getAlbumQuery(nameIncludes, tag, parentID, date, keyword, null);
-  const q = queryRes[0];
-  const params = queryRes[1];
+  const parentID = parseInt(req.query.parentID, 10);
+  const { updated } = req.query;
+
+  console.log(name);
+  console.log(tag);
+  console.log(keyword);
+  console.log(parentID);
+  console.log(updated);
+
+  const { query, params } = getAlbumQuery({
+    name,
+    tag,
+    parentID,
+    updated,
+    keyword,
+  });
 
   // temp for testing
-  console.log(nameIncludes);
-  console.log(tag);
-  console.log(parentID);
-  console.log(date);
-  console.log(keyword);
-  console.log(q);
+  console.log(query);
   console.log(params);
+
   try {
     conn = await req.app.locals.pool.getConnection();
-    // console.log(await conn.query(q, params));
-    const result = await conn.query(q);
-    //console.log(result);
+    const result = await conn.query(query, params);
     res.json(result);
   } catch (err) {
     res.json(`error${err}`);
@@ -54,16 +54,14 @@ export async function albumsBy(req, res) {
 export async function byAlbumID(req, res) {
   let conn;
   const albumID = parseInt(req.params.albumID, 10);
-  const queryRes = getAlbumQuery(null, null, null, null, null, albumID);
-  const q = queryRes[0];
-  const params = queryRes[1];
+  const { query, params } = getAlbumQuery({ albumID });
 
   // temp for testing
-  console.log(q);
-  console.log(albumID);
+  console.log(query);
+  console.log(params);
   try {
     conn = await req.app.locals.pool.getConnection();
-    const result = await conn.query(q);
+    const result = await conn.query(query, params);
     res.json(result);
     return;
   } catch (err) {
@@ -88,45 +86,46 @@ export async function byAlbumID(req, res) {
  *
  * @return {Object[String, Array]} = template statement, parameters for template statement
  */
-function getAlbumQuery(name, tag, parentID, date, keyword, albumID) {
+function getAlbumQuery({ name, tag, parentID, updated, keyword, albumID }) {
   const cols = `ID, Title, Parent, Tags, Keywords, Artists, Updated`;
   const params = [];
-  let q = '';
+  let q = ``;
   const basicQuery = `SELECT ${cols} FROM Album WHERE 1=1`;
+  console.log(name);
   // parent
   if (parentID) {
-    q += ` AND Album.Parent = ${parentID}`;
-    params.push(parentID);
+    q += ` AND Album.Parent = ?`;
+    params.push(parentID.toString());
   }
   // name
   if (name) {
-    q += ` AND Album.Title LIKE '%${name}%'`;
-    params.push(name);
+    q += ` AND Album.Title LIKE ?`;
+    params.push(`%${name}%`);
   }
   // tag
   if (tag) {
-    q += ` AND Album.Tags LIKE '%${tag}%'`;
-    params.push(tag);
+    q += ` AND Album.Tags LIKE ?`;
+    params.push(`%${tag}%`);
   }
   // date
-  if (date) {
-    q += ` AND Album.Updated > '${date}'`;
-    params.push(date);
+  if (updated) {
+    q += ` AND Album.Updated > ?`;
+    params.push(`${updated}`);
   }
   // keyword
   if (keyword) {
-    q += ` AND Album.Keywords LIKE '%${keyword}%'`;
-    params.push(keyword);
+    q += ` AND Album.Keywords LIKE ?`;
+    params.push(`%${keyword}`);
   }
   // album id
   if (albumID) {
-    q += ` AND Album.ID = ${albumID}`;
-    params.push(albumID);
+    q += ` AND Album.ID = ?`;
+    params.push(albumID.toString());
   }
   // // should we do this?
   // else {
   //   q += ` AND Parent IS NULL`;
   // }
   // return an object with a query and its parameters
-  return [`${basicQuery + q};`, params];
+  return { query: `${basicQuery} ${q};`, params };
 }
