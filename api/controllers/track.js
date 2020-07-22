@@ -10,9 +10,7 @@ export async function tracksBy(req, res) {
   let conn;
   const albumID = parseInt(req.query.albumID, 10);
   const artistID = parseInt(req.query.artistid, 10);
-  const { name } = req.query;
-  const { length } = req.query;
-  const { type } = req.query;
+  const { name, length, type } = req.query;
   const { query, params } = getTrackQuery({
     albumID,
     artistID,
@@ -71,9 +69,6 @@ export async function byTrackID(req, res) {
  * @param {String} length - updated after given date
  * @param {String} type - keyword for fuzzy search
  * @param {Int} trackID - albumID for exact search
- * @param {String} artistName - artist name for fuzzy search
- * @param {String} location - location (country, city, or state) for fuzzy search
- * @param {String} lyric - main line lyric for fuzzy search
  *
  * @return {Object[String, Array]} = template statement, parameters for template statement
  */

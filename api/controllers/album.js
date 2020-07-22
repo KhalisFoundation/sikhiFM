@@ -11,11 +11,8 @@
  */
 export async function albumsBy(req, res) {
   let conn;
-  const { name } = req.query;
-  const { tag } = req.query;
-  const { keyword } = req.query;
   const parentID = parseInt(req.query.parentID, 10);
-  const { updated } = req.query;
+  const { name, tag, keyword, updated } = req.query;
   const { query, params } = getAlbumQuery({
     name,
     tag,
@@ -98,7 +95,7 @@ function getAlbumQuery({ name, tag, parentID, updated, keyword, albumID }) {
   // keyword
   if (keyword) {
     q += ' AND Album.Keywords LIKE ?';
-    params.push(`%${keyword}`);
+    params.push(`%${keyword}%`);
   }
   // album id
   if (albumID) {
