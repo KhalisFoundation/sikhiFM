@@ -127,7 +127,7 @@ function getAlbumQuery({ name, tag, parentID, updated, keyword, artistName, albu
   // keyword
   if (keyword) {
     q += ' AND Album.Keywords LIKE ?';
-    params.push(`%${keyword}`);
+    params.push(`%${keyword}%`);
   }
   // album id
   if (albumID) {

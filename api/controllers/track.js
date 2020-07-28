@@ -27,7 +27,6 @@ export async function tracksBy(req, res) {
 
   console.log(location);
   console.log(query, params);
-
   try {
     conn = await req.app.locals.pool.getConnection();
     const result = await conn.query(query, params);
@@ -141,8 +140,7 @@ function getTrackQuery({ albumID, artistID, name, length, type, trackID, artistN
   if (trackID) {
     q += ' AND ID = ?';
     params.push(trackID.toString());
-  }
-  
+  }  
   //lyric
   if(lyric) {
     //basicQuery =
