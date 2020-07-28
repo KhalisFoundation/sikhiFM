@@ -1,4 +1,11 @@
 /**
+ * function: tracksBy
+ * sends all albums according to the given to the search query
+ * if none are specified, all parent albums are returned
+ *
+ * @param {Request} req - Express request object
+ * @param {Response} res - Express response object
+ *
  * /tracks : all tracks
  * /tracks?albumID={albumID} : Search for tracks that have this albumID
  * /tracks?name={name} : Search for tracks that matches this name (fuzzy match)
@@ -7,13 +14,12 @@
  * /tracks?artistID={artistID} : Search for tracks that have this artistId
  * /tracks?artistName={artistName} : Search for tracks by artist name (fuzzy match)
  * /tracks?location={location} : Search for tracks by country name/city name/state name (fuzzy match)
- * /tracks?lyric={lyric} : Search for tracks that have these lyrics as the main line (fuzzy match)
  */
 export async function tracksBy(req, res) {
   let conn;
   const albumID = parseInt(req.query.albumID, 10);
   const artistID = parseInt(req.query.artistid, 10);
-  const { name, length, type, artistName, location, lyric } = req.query;
+  const { name, length, type, artistName, location } = req.query;
   const { query, params } = getTrackQuery({
     albumID,
     artistID,
@@ -21,11 +27,9 @@ export async function tracksBy(req, res) {
     length,
     type,
     artistName,
-    location, 
-    lyric
+    location,
   });
 
-  console.log(location);
   console.log(query, params);
 
   try {
@@ -41,7 +45,6 @@ export async function tracksBy(req, res) {
     }
   }
 }
-
 /**
  * function: byTrackID
  * sends the track with the given id
@@ -52,6 +55,8 @@ export async function byTrackID(req, res) {
   let conn;
   const trackID = parseInt(req.params.trackID, 10);
   const { query, params } = getTrackQuery({ trackID });
+  console.log(query, params);
+
   try {
     conn = await req.app.locals.pool.getConnection();
     const result = await conn.query(query, params);
@@ -80,73 +85,74 @@ export async function byTrackID(req, res) {
  * @param {Int} trackID - albumID for exact search
  * @param {String} artistName - artist name for fuzzy search
  * @param {String} location - location (country, city, or state) for fuzzy search
- * @param {String} lyric - main line lyric for fuzzy search
  *
  * @return {Object[String, Array]} = template statement, parameters for template statement
  */
 
-function getTrackQuery({ albumID, artistID, name, length, type, trackID, artistName, location, lyric }) {
-  var cols = `Track.ID, Track.Title, Track.Media, TrackAlbum.Track, TrackAlbum.Album, Track.Length, Track.Updated`;
-  var params = [];
-  var q = '';
-  var basicQuery = `FROM Track LEFT JOIN TrackAlbum ON TrackAlbum.Album = Track.ID WHERE 1=1`;
-  //artist's name
-  if(artistName) {
-    cols +=  `Artist.ID as ArtistID, Artist.Name, Artist.NameGurmukhi, Artist.Description, `+
-    `Artist.Detail, Artist.Tags as ArtistTags, Artist.Keywords as ArtistKeywords `;
-    basicQuery =  `FROM Track `+
-    `LEFT JOIN Artist ON Track.Artist = Artist.ID `+
-    `WHERE Artist.Name Like ?`
-    params.push(`%${artistName}%`)
+function getTrackQuery({
+  albumID,
+  artistID,
+  name,
+  length,
+  type,
+  trackID,
+  artistName,
+  location,
+}) {
+  let cols =
+    'Track.ID, Track.Title, Track.Media, TrackAlbum.Track, TrackAlbum.Album, Track.Length, Track.Updated';
+  let joins = 'LEFT JOIN TrackAlbum ON TrackAlbum.Album = Track.ID';
+  let specifications = ' WHERE 1=1';
+  const params = [];
+  // artist's name
+  if (artistName) {
+    cols +=
+      ', Artist.ID as ArtistID, Artist.Name, Artist.NameGurmukhi,' +
+      ' Artist.Description, Artist.Detail, Artist.Tags as ArtistTags, ' +
+      ' Artist.Keywords as ArtistKeywords ';
+    joins += ' LEFT JOIN Artist ON Track.Artist = Artist.ID';
+    specifications += ' AND Artist.Name Like ?';
+    params.push(`%${artistName}%`);
   }
-  //location
-  if(location) {
-    basicQuery = `SELECT Track.ID, Track.Title, Track.Media, Track.Length, Track.Updated, ` +
-    `Location.City, Location.State, Location.Country, Location.Nickname as LocationNickname ` +
-    `FROM Track ` + 
-    `LEFT JOIN Location ON Track.Location = Location.ID ` +
-    `WHERE City Like ? ` +
-    `OR State LIKE ? ` +
-    `OR Country LIKE ?`;
+  // location
+  if (location) {
+    cols +=
+      ', Location.City, Location.State, Location.Country, Location.Nickname as LocationNickname';
+    joins += ' LEFT JOIN Location ON Track.Location = Location.ID';
+    specifications = ' AND City Like ? OR State LIKE ? OR Country LIKE ?';
     params.push(`%${location}%`);
     params.push(`%${location}%`);
     params.push(`%${location}%`);
   }
   // album id
   if (albumID) {
-    q += ' AND Album = ?';
+    specifications += ' AND Album = ?';
     params.push(albumID.toString());
   }
   // artist id
   if (artistID) {
-    q += ' AND Artist = ?';
+    specifications += ' AND Artist = ?';
     params.push(artistID.toString());
   }
   // name
   if (name) {
-    q += ' AND Title LIKE ?';
+    specifications += ' AND Title LIKE ?';
     params.push(`%${name}%`);
   }
   // length
   if (length) {
-    q += ' AND Length > ?';
+    specifications += ' AND Length > ?';
     params.push(`${length}`);
   }
   // type
   if (type) {
-    q += ` AND Type = ?`;
+    specifications += ' AND Type = ?';
     params.push(`${type}`);
   }
   // track id
   if (trackID) {
-    q += ' AND ID = ?';
+    specifications += ' AND ID = ?';
     params.push(trackID.toString());
   }
-  
-  //lyric
-  if(lyric) {
-    //basicQuery =
-    params.push(lyric)
-  }
-  return { query: `SELECT ${cols + basicQuery + q};`, params };
+  return { query: `SELECT ${cols} FROM Track ${joins + specifications};`, params };
 }
