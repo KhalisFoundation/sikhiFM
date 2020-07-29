@@ -31,7 +31,6 @@ export async function tracksBy(req, res) {
   });
 
   console.log(query, params);
-
   try {
     conn = await req.app.locals.pool.getConnection();
     const result = await conn.query(query, params);
