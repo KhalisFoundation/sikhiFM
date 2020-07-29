@@ -89,16 +89,7 @@ export async function byTrackID(req, res) {
  * @return {Object[String, Array]} = template statement, parameters for template statement
  */
 
-function getTrackQuery({
-  albumID,
-  artistID,
-  name,
-  length,
-  type,
-  trackID,
-  artistName,
-  location,
-}) {
+function getTrackQuery({ albumID, artistID, name, length, type, trackID, artistName, location }) {
   let cols =
     'Track.ID, Track.Title, Track.Media, TrackAlbum.Track, TrackAlbum.Album, Track.Length, Track.Updated';
   let joins = 'LEFT JOIN TrackAlbum ON TrackAlbum.Album = Track.ID';

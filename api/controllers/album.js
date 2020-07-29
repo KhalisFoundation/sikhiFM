@@ -1,3 +1,5 @@
+// import { addSpecs, splitParams } from '..';
+
 /**
  * function: albumBY
  * sends all albums according to the given to the search query
@@ -17,14 +19,14 @@
  */
 export async function albumsBy(req, res) {
   let conn;
-  const { name, tag, keyword, updated, artistID } = req.query;
+  const { name, tags, keywords, updated, artistID } = req.query;
   const parentID = parseInt(req.query.parentID, 10);
   const { query, params } = getAlbumQuery({
     name,
-    tag,
+    tags,
     parentID,
     updated,
-    keyword,
+    keywords,
     artistID,
   });
   console.log(query, params);
@@ -73,22 +75,22 @@ export async function byAlbumID(req, res) {
  * creates query and parameters for an album query to the database
  *
  * @param {String} name - string for fuzzy search
- * @param {String} tag - tag for fuzzy search
+ * @param {String} tags - tag for fuzzy search
  * @param {Int} parentID - parentID for exact search
  * @param {String} date - updated after given date
- * @param {String} keyword - keyword for fuzzy search
+ * @param {String} keywords - keyword for fuzzy search
  * @param {Int} albumID - albumID for exact search
  * @param {Int} artistName - artistName for fuzzy search
  * @param {Int} artistID - artistID for exact search
  *
  * @return {Object[String, Array]} = template statement, parameters for template statement
  */
-function getAlbumQuery({ name, tag, parentID, updated, keyword, albumID, artistID }) {
+function getAlbumQuery({ name, tags, parentID, updated, keywords, albumID, artistID }) {
   let cols =
     'Album.ID, Album.Title as AlbumName, Album.Parent, Album.Tags, Album.Keywords, Album.Artists, Album.Updated';
   let joins = '';
   let specifications = ' WHERE 1=1';
-  const params = [];
+  let params = [];
   // artist's id
   if (artistID) {
     cols +=
@@ -108,9 +110,9 @@ function getAlbumQuery({ name, tag, parentID, updated, keyword, albumID, artistI
     params.push(`%${name}%`);
   }
   // tag
-  if (tag) {
+  if (tags) {
     specifications += ' AND Album.Tags LIKE ?';
-    params.push(`%${tag}%`);
+    params.push(`%${tags}%`);
   }
   // date
   if (updated) {
@@ -118,9 +120,10 @@ function getAlbumQuery({ name, tag, parentID, updated, keyword, albumID, artistI
     params.push(`${updated}`);
   }
   // keyword
-  if (keyword) {
-    specifications += ' AND Album.Keywords LIKE ?';
-    params.push(`%${keyword}`);
+  if (keywords) {
+    const keywordsArr = splitParams(keywords);
+    specifications += addSpecs(' AND Album.Keywords LIKE ?', keywordsArr.length);
+    params = params.concat(keywordsArr);
   }
   // album id
   if (albumID) {
@@ -132,4 +135,19 @@ function getAlbumQuery({ name, tag, parentID, updated, keyword, albumID, artistI
     specifications += ' AND Parent IS NULL';
   }
   return { query: `SELECT ${cols} FROM Album${joins + specifications};`, params };
+}
+
+function addSpecs(specString, len) {
+  let currStr = '';
+  let count = len;
+  while (count > 0) {
+    currStr += specString;
+    count--;
+  }
+  return currStr;
+}
+
+function splitParams(paramStr) {
+  const paramArr = paramStr.split(',').map((element) => `%${element}%`);
+  return paramArr;
 }
