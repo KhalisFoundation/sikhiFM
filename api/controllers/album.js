@@ -1,4 +1,4 @@
-// import { addSpecs, splitParams } from '..';
+import { addSpecs, splitString } from './utils';
 
 /**
  * function: albumBY
@@ -9,27 +9,25 @@
  * @param {Response} res - Express response object
  *
  * /albums : all parent albums
- * /albums?name={name} : Search for album that matches this name (fuzzy match)
- * /albums?tag={tag} : Search for albums that have these tags (fuzzy matches)
- * /albums?keyword={keyword} : Search for albums that have these keywords (fuzzy matches)
+ * /albums?names={names} : Search for album that matches this name (fuzzy match)
+ * /albums?tags={tags} : Search for albums that have these tags (fuzzy matches)
+ * /albums?keywords={keywords} : Search for albums that have these keywords (fuzzy matches)
  * /albums?parentID={parentID} : Search for albums that has this albumId as a parent.
  * /albums?updated={updated} : Search for albums that were last updated after this date.
- * /albums?artistName={artistName} : Search for all albums that have this artist (exact match)
  * /albums?artistID={artistID} : Search for all albums that have this artist (exact match)
  */
 export async function albumsBy(req, res) {
   let conn;
-  const { name, tags, keywords, updated, artistID } = req.query;
+  const { names, tags, keywords, updated, artistID } = req.query;
   const parentID = parseInt(req.query.parentID, 10);
   const { query, params } = getAlbumQuery({
-    name,
+    names,
     tags,
     parentID,
     updated,
     keywords,
     artistID,
   });
-  console.log(query, params);
   try {
     conn = await req.app.locals.pool.getConnection();
     const result = await conn.query(query, params);
@@ -44,10 +42,9 @@ export async function albumsBy(req, res) {
   }
 }
 
-// function:byAlbumID
-// sends the album with the given id
 /**
  * function: byAlbumID
+ * sends the album with the given id
  * @param {Request} req - Express request object
  * @param {Response} res - Express response object
  */
@@ -55,7 +52,6 @@ export async function byAlbumID(req, res) {
   let conn;
   const albumID = parseInt(req.params.albumID, 10);
   const { query, params } = getAlbumQuery({ albumID });
-  console.log(query, params);
   try {
     conn = await req.app.locals.pool.getConnection();
     const result = await conn.query(query, params);
@@ -74,22 +70,21 @@ export async function byAlbumID(req, res) {
  * function: getAlbumQuery
  * creates query and parameters for an album query to the database
  *
- * @param {String} name - string for fuzzy search
+ * @param {String} names - string for fuzzy search
  * @param {String} tags - tag for fuzzy search
  * @param {Int} parentID - parentID for exact search
  * @param {String} date - updated after given date
  * @param {String} keywords - keyword for fuzzy search
  * @param {Int} albumID - albumID for exact search
- * @param {Int} artistName - artistName for fuzzy search
  * @param {Int} artistID - artistID for exact search
  *
  * @return {Object[String, Array]} = template statement, parameters for template statement
  */
-function getAlbumQuery({ name, tags, parentID, updated, keywords, albumID, artistID }) {
+function getAlbumQuery({ names, tags, parentID, updated, keywords, albumID, artistID }) {
   let cols =
     'Album.ID, Album.Title as AlbumName, Album.Parent, Album.Tags, Album.Keywords, Album.Artists, Album.Updated';
   let joins = '';
-  let specifications = ' WHERE 1=1';
+  let specifications = ' WHERE 1 = 1';
   let params = [];
   // artist's id
   if (artistID) {
@@ -105,14 +100,10 @@ function getAlbumQuery({ name, tags, parentID, updated, keywords, albumID, artis
     params.push(parentID.toString());
   }
   // name
-  if (name) {
-    specifications += ' AND Album.Title LIKE ?';
-    params.push(`%${name}%`);
-  }
-  // tag
-  if (tags) {
-    specifications += ' AND Album.Tags LIKE ?';
-    params.push(`%${tags}%`);
+  if (names) {
+    const namesArr = splitString(names);
+    specifications += addSpecs(' AND lower(Album.Title) LIKE lower(?)', namesArr.length);
+    params = params.concat(namesArr);
   }
   // date
   if (updated) {
@@ -121,9 +112,15 @@ function getAlbumQuery({ name, tags, parentID, updated, keywords, albumID, artis
   }
   // keyword
   if (keywords) {
-    const keywordsArr = splitParams(keywords);
-    specifications += addSpecs(' AND Album.Keywords LIKE ?', keywordsArr.length);
+    const keywordsArr = splitString(keywords);
+    specifications += addSpecs(' AND lower(Album.Keywords) LIKE lower(?)', keywordsArr.length);
     params = params.concat(keywordsArr);
+  }
+  // tag
+  if (tags) {
+    const tagsArr = splitString(tags);
+    specifications += addSpecs(' AND lower(Album.Tags) LIKE lower(?)', tagsArr.length);
+    params = params.concat(tagsArr);
   }
   // album id
   if (albumID) {
@@ -131,23 +128,8 @@ function getAlbumQuery({ name, tags, parentID, updated, keywords, albumID, artis
     params.push(albumID.toString());
   }
   // should parent be null?
-  if (specifications === ' WHERE 1=1') {
+  if (specifications === ' WHERE 1 = 1') {
     specifications += ' AND Parent IS NULL';
   }
-  return { query: `SELECT ${cols} FROM Album${joins + specifications};`, params };
-}
-
-function addSpecs(specString, len) {
-  let currStr = '';
-  let count = len;
-  while (count > 0) {
-    currStr += specString;
-    count--;
-  }
-  return currStr;
-}
-
-function splitParams(paramStr) {
-  const paramArr = paramStr.split(',').map((element) => `%${element}%`);
-  return paramArr;
+  return { query: `SELECT ${cols} FROM Album${joins + specifications} GROUP BY ID;`, params };
 }

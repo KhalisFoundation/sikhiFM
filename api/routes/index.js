@@ -35,8 +35,7 @@ route.get('/health', limiter.rate250, healthcheck);
  * /albums?keyword={keyword} : Search for albums that have these keywords (fuzzy matches)
  * /albums?parentID={parentID} : Search for albums that has this albumId as a parent.
  * /albums?updated={updated} : Search for albums that were last updated after this date.
- * /albums?artistName={artistName} : Search for all albums that have this artist (exact match)
- * /albums?lyric={lyric} : Search for all albums that contain a track with these lyrics (fuzzy match)
+ * /albums?artistID={artistID} : Search for all albums that have this artist (exact match)
  */
 route.get('/albums', limiter.rate250, albumsBy);
 
@@ -53,7 +52,6 @@ route.get('/albums/:albumID', limiter.rate250, byAlbumID);
  * /tracks?artistID={artistID} : Search for tracks that have this artistId
  * /tracks?artistName={artistName} : Search for tracks by artist name (fuzzy match)
  * /tracks?location={location} : Search for tracks by country name/city name/state name (fuzzy match)
- * /tracks?lyric={lyric} : Search for tracks that have these lyrics as the main line (fuzzy match)
  */
 route.get('/tracks', limiter.rate250, tracksBy);
 

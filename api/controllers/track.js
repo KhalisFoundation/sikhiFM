@@ -1,3 +1,5 @@
+import { addSpecs, splitString } from './utils';
+
 /**
  * function: tracksBy
  * sends all albums according to the given to the search query
@@ -19,18 +21,16 @@ export async function tracksBy(req, res) {
   let conn;
   const albumID = parseInt(req.query.albumID, 10);
   const artistID = parseInt(req.query.artistid, 10);
-  const { name, length, type, artistName, location } = req.query;
+  const { names, length, type, artistName, location } = req.query;
   const { query, params } = getTrackQuery({
     albumID,
     artistID,
-    name,
+    names,
     length,
     type,
     artistName,
     location,
   });
-
-  console.log(query, params);
   try {
     conn = await req.app.locals.pool.getConnection();
     const result = await conn.query(query, params);
@@ -49,13 +49,12 @@ export async function tracksBy(req, res) {
  * sends the track with the given id
  * @param {Request} req
  * @param {Response} res
+ *
  */
 export async function byTrackID(req, res) {
   let conn;
   const trackID = parseInt(req.params.trackID, 10);
   const { query, params } = getTrackQuery({ trackID });
-  console.log(query, params);
-
   try {
     conn = await req.app.locals.pool.getConnection();
     const result = await conn.query(query, params);
@@ -78,7 +77,7 @@ export async function byTrackID(req, res) {
  *
  * @param {String} albumID - string for fuzzy search
  * @param {String} artistID - tag for fuzzy search
- * @param {Int} name - parentID for exact search
+ * @param {Int} names - parentID for exact search
  * @param {String} length - updated after given date
  * @param {String} type - keyword for fuzzy search
  * @param {Int} trackID - albumID for exact search
@@ -88,12 +87,12 @@ export async function byTrackID(req, res) {
  * @return {Object[String, Array]} = template statement, parameters for template statement
  */
 
-function getTrackQuery({ albumID, artistID, name, length, type, trackID, artistName, location }) {
+function getTrackQuery({ albumID, artistID, names, length, type, trackID, artistName, location }) {
   let cols =
     'Track.ID, Track.Title, Track.Media, TrackAlbum.Track, TrackAlbum.Album, Track.Length, Track.Updated';
   let joins = 'LEFT JOIN TrackAlbum ON TrackAlbum.Album = Track.ID';
-  let specifications = ' WHERE 1=1';
-  const params = [];
+  let specifications = ' WHERE 1 = 1';
+  let params = [];
   // artist's name
   if (artistName) {
     cols +=
@@ -101,7 +100,7 @@ function getTrackQuery({ albumID, artistID, name, length, type, trackID, artistN
       ' Artist.Description, Artist.Detail, Artist.Tags as ArtistTags, ' +
       ' Artist.Keywords as ArtistKeywords ';
     joins += ' LEFT JOIN Artist ON Track.Artist = Artist.ID';
-    specifications += ' AND Artist.Name Like ?';
+    specifications += ' AND lower(Artist.Name) Like lower(?)';
     params.push(`%${artistName}%`);
   }
   // location
@@ -109,7 +108,8 @@ function getTrackQuery({ albumID, artistID, name, length, type, trackID, artistN
     cols +=
       ', Location.City, Location.State, Location.Country, Location.Nickname as LocationNickname';
     joins += ' LEFT JOIN Location ON Track.Location = Location.ID';
-    specifications = ' AND City Like ? OR State LIKE ? OR Country LIKE ?';
+    specifications =
+      ' AND lower(City) Like lower(?) OR lower(State) LIKE lower(?) OR lower(Country) LIKE lower(?)';
     params.push(`%${location}%`);
     params.push(`%${location}%`);
     params.push(`%${location}%`);
@@ -125,13 +125,14 @@ function getTrackQuery({ albumID, artistID, name, length, type, trackID, artistN
     params.push(artistID.toString());
   }
   // name
-  if (name) {
-    specifications += ' AND Title LIKE ?';
-    params.push(`%${name}%`);
+  if (names) {
+    const namesArr = splitString(names);
+    specifications += addSpecs(' AND lower(Title) LIKE lower(?)', namesArr.length);
+    params = params.concat(namesArr);
   }
   // length
   if (length) {
-    specifications += ' AND Length > ?';
+    specifications += ' AND lower(Length) > lower(?)';
     params.push(`${length}`);
   }
   // type
@@ -144,5 +145,5 @@ function getTrackQuery({ albumID, artistID, name, length, type, trackID, artistN
     specifications += ' AND ID = ?';
     params.push(trackID.toString());
   }
-  return { query: `SELECT ${cols} FROM Track ${joins + specifications};`, params };
+  return { query: `SELECT  ${cols} FROM Track ${joins + specifications} GROUP BY ID;`, params };
 }
